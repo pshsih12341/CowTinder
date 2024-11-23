@@ -15,7 +15,8 @@
 	position: fixed;
 	z-index: 10;
 	bottom: 80px;
-	left: calc(73% - 166px);
+	left: 50%; /* Центрирование по горизонтали */
+	transform: translateX(-50%);
 	border-radius: 8px;
 }
 .block {

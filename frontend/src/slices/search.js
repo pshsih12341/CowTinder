@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  activeElem: {},
+  activeElem: null,
 };
 
 const searchSlice = createSlice({
@@ -11,13 +11,15 @@ const searchSlice = createSlice({
     setActive: (state, action) => {
       state.activeElem = action.payload;
     },
-    setFile: (state, action) => {
-      if (state.activeElem) {
-        state.activeElem.file = action.payload; // Устанавливаем файл в активный элемент
+    setField: (state, action) => {
+      const { field, value } = action.payload; // Деструктурируем поле и значение
+      if (!state.activeElem) {
+        state.activeElem = {}; // Если activeElem отсутствует, инициализируем пустой объект
       }
+      state.activeElem[field] = value;
     },
   },
 });
 
-export const { setActive, setFile } = searchSlice.actions;
+export const { setActive, setField } = searchSlice.actions;
 export default searchSlice.reducer;

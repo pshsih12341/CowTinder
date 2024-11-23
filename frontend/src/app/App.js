@@ -7,9 +7,24 @@ import { ConfigProvider } from 'antd';
 const App = () => {
   return (
     <ConfigProvider     theme={{
-      token: {
-        colorPrimary: '#E33535',
-        colorBgContainer: '#E33535',
+      components:{
+        Steps:{
+          descriptionMaxWidth:110
+        },
+        Button:{
+          defaultBg:"#E33535",
+          defaultHoverBg:"#E33535",
+          defaultActiveBg:"#E33535",
+          defaultActiveBorderColor:"#E33535",
+          defaultHoverBorderColor:"#E33535",
+          defaultColor:"#FFFFFF",
+          textTextColor:"#FFFFFF",
+          textTextActiveColor:'#FFFFFF',
+          defaultHoverColor:'#FFFFFF',
+          defaultActiveColor:'#FFFFFF',
+          textTextHoverColor:'#FFFFFF',
+          defaultGhostColor:'#E33535'
+        }
       },
     }}>
       <Provider store={store}> {/* Оборачиваем в Provider */}

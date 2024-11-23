@@ -118,3 +118,31 @@ input {
 	margin: 0 auto;
 	box-sizing: content-box;
 }
+
+/* Базовые стили для скроллбара */
+::-webkit-scrollbar {
+	width: 10px; /* Ширина скроллбара */
+	height: 10px; /* Высота горизонтального скроллбара */
+}
+
+/* Стили ползунка (thumb) */
+::-webkit-scrollbar-thumb {
+	background: #888; /* Цвет ползунка */
+	border-radius: 5px; /* Скругленные углы */
+}
+
+/* Стили фона скроллбара (track) */
+::-webkit-scrollbar-track {
+	background: #f0f0f0; /* Цвет фона */
+}
+
+/* Стили при наведении на ползунок */
+::-webkit-scrollbar-thumb:hover {
+	background: #555; /* Более темный цвет при наведении */
+}
+
+/* Скрытие скроллбара (при необходимости) */
+body::-webkit-scrollbar {
+	display: none;
+}
+	
