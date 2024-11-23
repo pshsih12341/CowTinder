@@ -1,0 +1,27 @@
+{
+	"short_name": "CowTinder",
+	"name": "CowTinder",
+	"icons": [
+		{
+			"src": "/img/1.png",
+			"sizes": "128x128",
+			"type": "image/png"
+		},
+		{
+			"src": "https://getdrawings.com/free-icon-bw/boston-terrier-icon-4.png",
+			"sizes": "512x512",
+			"type": "image/png"
+		}
+	],
+	"screenshots": [
+		{
+			"src": "/screenshots/screenshot1.png",
+			"type": "image/png",
+			"sizes": "1280x720"
+		}
+	],
+	"start_url": ".",
+	"display": "standalone",
+	"theme_color": "#000000",
+	"background_color": "#ffffff"
+}

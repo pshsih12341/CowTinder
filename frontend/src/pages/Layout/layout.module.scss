@@ -1,0 +1,73 @@
+.footer {
+	display: flex;
+	height: 75px;
+	border-radius: 12.5px 12.5px 0 0;
+	background-color: #e33535;
+	justify-content: space-between;
+	position: fixed;
+	align-items: center;
+	z-index: 100;
+	bottom: 0;
+	overflow: hidden;
+	width: 100%;
+	padding: 2.5px;
+}
+.btn {
+	padding: 11px 5px;
+	display: flex;
+	align-items: center;
+	flex-direction: column;
+	justify-content: space-between;
+	gap: 6px;
+	width: 100%;
+	font-size: 10px;
+	text-align: center;
+	color: white;
+	text-decoration: none;
+	cursor: pointer;
+}
+.icon {
+	width: 30px;
+	height: 30px;
+	position: relative;
+	background-color: white; /* Цвет иконки */
+	mask: no-repeat center;
+	-webkit-mask: no-repeat center;
+	mask-size: contain;
+	-webkit-mask-size: contain;
+}
+.active .icon {
+	background-color: #e33535;
+}
+.home {
+	mask: url(../../shared/img/HomeOutlined.svg);
+	-webkit-mask: url(../../shared/img/HomeOutlined.svg);
+}
+.search {
+	mask: url(../../shared/img/FileSearchOutlined.svg);
+	-webkit-mask: url(../../shared/img/FileSearchOutlined.svg);
+}
+.history {
+	mask: url(../../shared/img/CalendarOutlined.svg);
+	-webkit-mask: url(../../shared/img/CalendarOutlined.svg);
+}
+.active {
+	background-color: white;
+	border-radius: 10px;
+	color: #e33535;
+}
+.header {
+	display: flex;
+	height: 75px;
+	border-radius: 0 0 12.5px 12.5px;
+	font-size: 24px;
+	background-color: #e33535;
+	justify-content: center;
+	align-items: center;
+	color: white;
+	z-index: 100;
+	top: 0;
+	overflow: hidden;
+	width: 100%;
+	padding: 2.5px;
+}

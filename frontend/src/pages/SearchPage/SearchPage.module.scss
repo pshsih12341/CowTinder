@@ -1,0 +1,60 @@
+.page {
+	padding: 25px 22.5px 100px;
+	display: flex;
+	flex-direction: column;
+	gap: 25px;
+}
+.title {
+	font-size: 32px;
+	text-align: center;
+	width: 100%;
+}
+.block {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-direction: column;
+	padding: 20px 0;
+	gap: 10px;
+	text-align: center;
+	font-size: 16px;
+	line-height: 24px;
+	border-radius: 20px;
+	box-shadow: 0px 4px 8px 0px #00000040;
+	color: #000;
+	text-align: center;
+	font-family: "Museo Sans Cyrl";
+	font-size: 16px;
+	font-style: normal;
+	font-weight: 400;
+	line-height: 24px; /* 150% */
+}
+.subTitle {
+	color: var(--Colors-Neutral-Icon-colorIcon, rgba(0, 0, 0, 0.45));
+	font-family: "Museo Sans Cyrl";
+	font-size: 12px;
+	font-style: normal;
+	font-weight: 400;
+	line-height: 24px;
+}
+.uploadInput {
+	display: none;
+}
+.uploadLabel,
+.btn {
+	display: flex;
+	padding: 0px var(--Components-Button-Global-paddingContentHorizontal, 16px);
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	gap: 8px;
+	color: #fff;
+	font-family: "Museo Sans Cyrl";
+	font-size: 16px;
+	font-style: normal;
+	font-weight: 400;
+	line-height: 24px; /* 150% */
+	border-radius: var(--Components-Button-Global-borderRadius, 6px);
+	background: #e33535;
+	box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+}

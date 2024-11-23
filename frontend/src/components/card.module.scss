@@ -1,0 +1,31 @@
+.card {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-direction: column;
+	padding: 20px 0;
+	gap: 10px;
+	font-size: 16px;
+	line-height: 24px;
+	border-radius: 20px;
+	box-shadow: 0px 4px 8px 0px #00000040;
+}
+.pass {
+	padding: 8px 16px;
+	background-color: #e33535;
+	box-shadow: 0px 4px 4px 0px #00000040;
+	color: white;
+	display: flex;
+	align-items: center;
+	border-radius: 8px;
+	gap: 8px;
+	align-items: center;
+	position: relative;
+}
+.pass::before {
+	content: url("../shared/img/PaperClipOutlined.svg");
+	height: 19px;
+}
+.active {
+	border: 3px solid #e33535;
+}
