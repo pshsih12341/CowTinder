@@ -3,6 +3,7 @@ import HomePage from "../pages/HomePage/HomePage";
 import Layout from "../pages/Layout/Layout";
 import HistoryPage from "../pages/HistoryPage/HistoryPage";
 import SearchPage from "../pages/SearchPage/SearchPage";
+import CreatePage from "../pages/CreatePage/CreatePage";
 
 const router = createBrowserRouter([
 	{
@@ -24,6 +25,10 @@ const router = createBrowserRouter([
 			{
 				path: "search",
 				element: <SearchPage />,
+			},
+			{
+				path: "home/createPass",
+				element: <CreatePage />,
 			},
 			{
 				path: "*", // Обработка несуществующих маршрутов
