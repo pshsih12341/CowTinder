@@ -1,5 +1,6 @@
 import pandas as pd
 from datetime import datetime
+from sqlalchemy.orm import Session
 from .models import Genotype
 
 # Чтение данных из файла
@@ -18,17 +19,19 @@ def read_data(file_path: str) -> pd.DataFrame:
         return pd.DataFrame()
 
 #* ФУНКЦИИ ДЛЯ ГЕНОТИПА
-def get_mutations(genotype_data, cow_id):
+def get_mutations(db: Session, cow_id: int) -> list:
     mutations = []
-    for genotype in genotype_data:
-        if genotype.id_individual == cow_id:
-            mutations.append({
-                'trait': genotype.trait,
-                'beta': genotype.beta,
-                'alt': genotype.alt,
-                'ref': genotype.ref
-            })
+    genotypes = db.query(Genotype).filter(Genotype.id_individual == cow_id).all()
+    
+    for genotype in genotypes:
+        mutations.append({
+            'trait': genotype.trait,
+            'beta': genotype.beta,
+            'alt': genotype.alt,
+            'ref': genotype.ref
+        })
     return mutations
+
 
 # Функция для расчета вклада каждой мутации
 def calculate_phenotypic_effect(genotype, beta):

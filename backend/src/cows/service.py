@@ -26,7 +26,7 @@ def get_penalty_for_cow(db: Session, cow_id: int, direction: str) -> float:
         return None
 
 # Подсчет вероятности проявления мутации для каждого признака    
-def calculate_mutation_probabilities(individual, partner, genotype_data):
+def calculate_mutation_probabilities(individual, partner, db: Session):
     probabilities = {}
 
     all_mutations = individual['mutations'] + partner['mutations']
@@ -35,21 +35,16 @@ def calculate_mutation_probabilities(individual, partner, genotype_data):
         trait = mutation['trait']
         beta = mutation['beta']
 
-        individual_genotypes = genotype_data[
-            (genotype_data['id_individual'] == individual['id_individual'])
-        ]['genotype_cow'].values
-
-        partner_genotypes = genotype_data[
-            (genotype_data['id_individual'] == partner['id_individual'])
-        ]['genotype_cow'].values
+        individual_genotypes = db.query(Genotype).filter(Genotype.id_individual == individual['id_individual']).all()
+        partner_genotypes = db.query(Genotype).filter(Genotype.id_individual == partner['id_individual']).all()
 
         probability = 0.0
         effect = 0.0
 
         # Перебор всех комбинаций генотипов партнёров
         for individual_genotype, partner_genotype in zip(individual_genotypes, partner_genotypes):
-            individual_alleles = individual_genotype.split('/')
-            partner_alleles = partner_genotype.split('/')
+            individual_alleles = individual_genotype.genotype_cow.split('/')
+            partner_alleles = partner_genotype.genotype_cow.split('/')
 
             combined_genotypes = [
                 f"{individual_alleles[0]}/{partner_alleles[0]}",
@@ -77,29 +72,56 @@ def calculate_mutation_probabilities(individual, partner, genotype_data):
 
     return probabilities
 
-def apply_effects_to_cow(base_cow, partner_cow, effects): 
+def apply_effects_to_cow(base_cow: dict, partner_cow: dict, effects: dict) -> dict: 
     updated_values = {} 
     for trait, data in effects.items(): 
         base_value = base_cow.get(trait, 0) 
         partner_value = partner_cow.get(trait, 0) 
-        updated_value = (base_value + partner_value) / 2 + data['effect'] 
+        
+        if trait == 'Удой л/день':
+            if base_cow.get('sex') == 'Самка' and partner_cow.get('sex') == 'Самка':
+                updated_value = (base_value + partner_value) / 2 + data['effect']
+            elif base_cow.get('sex') == 'Самка':
+                updated_value = base_value + data['effect']
+            elif partner_cow.get('sex') == 'Самка':
+                updated_value = partner_value + data['effect']
+            else:
+                continue 
+        else:
+            updated_value = (base_value + partner_value) / 2 + data['effect']
+        
+        # Проверка и корректировка значений в соответствии с ограничениями
+        if trait == 'Упитанность': 
+            updated_value = min(max(updated_value, 1), 5) 
+        elif trait == 'Здоровье (1-10)': 
+            updated_value = min(max(updated_value, 1), 10) 
+        elif trait == 'Генетическая ценность (баллы)': 
+            updated_value = min(updated_value, 100) 
         if data['effect'] < 0: 
             updated_value = max(updated_value, 0)
         if trait in ['Упитанность', 'Здоровье (1-10)', 'Генетическая ценность (баллы)']:
             updated_value = round(updated_value)
+            
         updated_values[trait] = {
             'updated_value': updated_value,
             'probability': data['probability']
         } 
     return updated_values
 
+def calculate_inbreeding_coefficient(cow: Cow) -> float:
+    if cow.father_id == cow.mother_id:
+        return 0.25
+    return 0
+
 def calculate(cow_data: dict, direction: Direction, type: TypeCross, db: Session) -> pd.DataFrame:  
     cow = Cow(**cow_data)
     phenotype_data = db.query(Phenotype).filter(Phenotype.id_individual != cow.id_individual, Phenotype.sex != cow.sex).all()
-    genotype_data = db.query(Genotype).all()
 
-    # for phenotype in phenotype_data: phenotype.mutations = get_mutations(genotype_data, phenotype.id_individual) 
-    # cow.mutations = get_mutations(genotype_data, cow.id_individual) 
+    cow_mutations = get_mutations(db, cow.id_individual) 
+    phenotype_mutations = {phenotype.id_individual: get_mutations(db, phenotype.id_individual) for phenotype in phenotype_data}
+    
+    cow_inbreeding_coefficient = calculate_inbreeding_coefficient(cow)
+
     updated_cows = []
 
     if type.value == 'purebred':
@@ -114,8 +136,20 @@ def calculate(cow_data: dict, direction: Direction, type: TypeCross, db: Session
 
             compatibility = calculate_compatibility(partner_cow, cow, partner_penalty, cow_penalty)
 
-            # effects = calculate_mutation_probabilities(cow, partner_cow, genotype_data)
-            # updated_values = apply_effects_to_cow(cow, partner_cow, effects) 
-            updated_cows.append({**partner_cow.__dict__, 'compatibility': compatibility})
+            partner_gcv = get_penalty_for_cow(db, partner_cow.id_individual, direction.value) 
+            partner_inbreeding_coefficient = calculate_inbreeding_coefficient(partner_cow)
+            if partner_inbreeding_coefficient + cow_inbreeding_coefficient > 0.25: 
+                continue 
+            if partner_gcv < 50: 
+                continue
+
+            partner_mutations = phenotype_mutations[partner_cow.id_individual]
+
+            effects = calculate_mutation_probabilities({'id_individual': cow.id_individual, 'mutations': cow_mutations}, {'id_individual': partner_cow.id_individual, 'mutations': partner_mutations}, db)
+            updated_values = apply_effects_to_cow(cow.dict(), partner_cow.__dict__, effects)
+            if partner_cow.sex == 'Самец': 
+                if 'Удой л/день' in updated_values: 
+                    del updated_values['Удой л/день']
+            updated_cows.append({**partner_cow.__dict__, 'compatibility': compatibility, 'mutations_child': updated_values})
 
     return sorted(updated_cows, key=lambda x: x['compatibility'], reverse=True)[:10]
