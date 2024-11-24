@@ -19,6 +19,7 @@ const SearchPage = () => {
 		{
 			title: "Шаг 1",
 			subTitle: "Загрузить электронный паспорт",
+			className: styles.dot,
 		},
 		{
 			title: "Шаг 2",
@@ -28,7 +29,7 @@ const SearchPage = () => {
 
 	const handleSumbit = () => {
 		dispatch(setSend({type, direction}));
-		dispatch(sendPassData());
+		dispatch(sendPassData(direction));
 		dispatch(toggleActive(null));
 		navigate(`/history/${length.length + 1}`);
 	};
@@ -36,7 +37,7 @@ const SearchPage = () => {
 		<div className={styles.page}>
 			<div>
 				<div className={styles.title}>Подбор партнера</div>
-				<Steps current={step} items={steps} progressDot direction='horizontal' responsive={false} size='small' />
+				<Steps className={styles.mySteps}current={step} items={steps} progressDot direction='horizontal' responsive={false} size='small' />
 			</div>
 			{step === 0 && (
 				<>

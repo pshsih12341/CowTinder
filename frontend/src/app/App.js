@@ -7,9 +7,13 @@ import { ConfigProvider } from 'antd';
 const App = () => {
   return (
     <ConfigProvider     theme={{
+      token:{
+        colorPrimary:"#E33535",
+      },
       components:{
         Steps:{
-          descriptionMaxWidth:110
+          descriptionMaxWidth:110,
+          defaultColor:"#E33535",
         },
         Button:{
           defaultBg:"#E33535",
@@ -26,6 +30,20 @@ const App = () => {
           defaultGhostColor:'#E33535'
         }
       },
+      Radio:{
+        buttonSolidCheckedActiveBg:'#E33535',
+        buttonSolidCheckedBg:'#E33535',
+        buttonSolidCheckedHoverBg:'#E33535',
+        buttonBg:'#E33535',
+        Group: {
+          buttonSolidCheckedActiveBg:'#E33535',
+          buttonSolidCheckedBg:'#E33535',
+          buttonSolidCheckedHoverBg:'#E33535',
+        }
+      },
+      RadioGroup:{
+        buttonSolidCheckedBg:"#E33535"
+      }
     }}>
       <Provider store={store}> {/* Оборачиваем в Provider */}
         <RouterProvider router={router} />
