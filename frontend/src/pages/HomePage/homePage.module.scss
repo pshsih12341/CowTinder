@@ -28,12 +28,32 @@
 	align-items: center;
 	justify-content: space-between;
 	flex-direction: column;
-	padding: 20px 0;
+	padding: 20px;
 	gap: 10px;
 	font-size: 16px;
 	line-height: 24px;
 	border-radius: 20px;
 	box-shadow: 0px 4px 8px 0px #00000040;
+}
+.textBlock {
+	text-align: center;
+	display: flex;
+	flex-direction: column;
+}
+.text {
+	color: #000;
+	text-align: center;
+	font-size: 16px;
+	font-style: normal;
+	font-weight: 400;
+	line-height: 24px; /* 150% */
+}
+.descr {
+	color: var(--Colors-Neutral-Icon-colorIcon, rgba(0, 0, 0, 0.45));
+	font-size: 13px;
+	font-style: normal;
+	font-weight: 400;
+	line-height: 24px;
 }
 .btnup {
 	display: flex;

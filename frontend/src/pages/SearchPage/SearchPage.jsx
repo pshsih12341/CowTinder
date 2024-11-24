@@ -8,6 +8,7 @@ import {useNavigate} from "react-router-dom";
 
 const SearchPage = () => {
 	const activeElem = useSelector(state => state.pass?.activeElem);
+	const data = useSelector(state => state.pass?.data);
 	const length = useSelector(s => s.pass?.history);
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
@@ -37,11 +38,11 @@ const SearchPage = () => {
 		<div className={styles.page}>
 			<div>
 				<div className={styles.title}>Подбор партнера</div>
-				<Steps className={styles.mySteps}current={step} items={steps} progressDot direction='horizontal' responsive={false} size='small' />
+				<Steps className={styles.mySteps} current={step} items={steps} progressDot direction='horizontal' responsive={false} size='small' />
 			</div>
 			{step === 0 && (
 				<>
-					<CardsFolder />
+					<CardsFolder data={data} />
 					<Button onClick={() => setStep(1)} className={styles.centerBtn} disabled={!activeElem}>
 						Перейти к следующему шагу
 					</Button>
