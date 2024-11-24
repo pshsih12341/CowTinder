@@ -86,42 +86,26 @@ const passSlice = createSlice({
         const id = state.history?.length + 1;
         const loadDate = new Date();
         const person = { ...state.currentSendElem };
-      
-        // Обрабатываем данные ответа
-        /* const updatedData = action.payload.map(item => {
-          return {
-            ...item,
-            mutations_child: [
-              {
-                'Удой': {
-                  mutation_probalitity: Math.floor(Math.random() * 101), // От 0 до 100
-                  updated_value: Math.floor(Math.random() * 51) // От 0 до 50
-                }
-              },
-              {
-                'Упитанность': {
-                  mutation_probalitity: Math.floor(Math.random() * 101), // От 0 до 100
-                  updated_value: Math.floor(Math.random() * 6) // От 0 до 5
-                }
-              }
-            ]
-          };
-        }); */
 
         const updatedData = action.payload.map(item => {
           return {
             ...item,
-            udoi:(person.milk_yield_day + item.milk_yield_day)/ 2,
-            upitonost:Math.ceil((person.body_condition + item.body_condition)/2)
+            udoi: (person.milk_yield_day + item.milk_yield_day) / 2,
+            upitonost: Math.ceil((person.body_condition + item.body_condition) / 2),
+            genballs: (person.genetic_value + item.genetic_value) / 2,
+            healthy: (person.health_score + item.health_score) / 2,
+            inbreedings: (person.inbreeding_coefficient + item.inbreeding_coefficient) / 2,
+            fertl: (person.fertility_percentage + item.fertility_percentage) / 2,
+            prirost: (person.weight_gain_day + item.weight_gain_day) / 2,
           };
-        })
-  
+        });
+
         // Формируем новый элемент истории
-        const newHistoryItem = { data: updatedData.slice(0,7), id, loadDate, person };
-  
+        const newHistoryItem = { data: updatedData.slice(0, 7), id, loadDate, person };
+
         // Добавляем новый элемент и оставляем только последние 5 записей
         state.history = [newHistoryItem, ...state.history];
-  
+
         // Сохраняем историю в localStorage
         localStorage.setItem("history", JSON.stringify(state.history));
       })      

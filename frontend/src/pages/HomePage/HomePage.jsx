@@ -26,26 +26,25 @@ const HomePage = () => {
 	// Фильтрация данных на основе поиска
 	const filteredData = data?.filter(item => String(item.id_individual).includes(searchValue));
 
-	console.log(filteredData);
 	const onClick = () => {
 		dispatch(setActive(data.activeElem));
 		navigate("/search");
 	};
 
 	const file = {
-		id_individual: 2,
-		sex: "Самец",
+		id_individual: 37,
+		sex: "Самка",
 		breed: "Швицкая",
-		birth_date: "2023-07-14T19:28:05.556Z",
-		father_id: 9107,
-		mother_id: 1784,
-		milk_yield_day: 21.730201934831,
+		birth_date: "2021-09-24",
+		father_id: 6020,
+		mother_id: 8710,
+		milk_yield_day: 38.0299677501387,
 		body_condition: 3,
-		inbreeding_coefficient: 0.07,
-		weight_gain_day: 0,
-		health_score: 5,
-		fertility_percentage: 0,
-		genetic_value: 70,
+		inbreeding_coefficient: 0.13,
+		weight_gain_day: 0.96,
+		health_score: 6,
+		fertility_percentage: 95,
+		genetic_value: 84,
 	};
 
 	return (
