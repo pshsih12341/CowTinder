@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import styles from "./CreatePage.module.scss";
-import {Button, DatePicker, InputNumber, Select} from "antd";
+import {Button, DatePicker, Input, InputNumber, Select} from "antd";
 import {useNavigate} from "react-router-dom";
 import {useDispatch} from "react-redux";
 import {addPass} from "../../slices/pass";
@@ -10,7 +10,6 @@ const CreatePage = () => {
 	const dispatch = useDispatch();
 	const [param, setParam] = useState({
 		sex: "Самец",
-		breed: "Мясная особь",
 		birth_date: null,
 	});
 
@@ -47,15 +46,7 @@ const CreatePage = () => {
 				</div>
 				<div className={styles.choseBlock}>
 					<div className={styles.chooseText}>Поррда особи:</div>
-					<Select
-						defaultValue='Мясная особь'
-						style={{width: "100%", textAlign: "start"}}
-						onChange={value => handleChange("breed", value)}
-						options={[
-							{value: "Мясная особь", label: "Мясная особь"},
-							{value: "Молочная особь", label: "Молочная особь"},
-						]}
-					/>
+					<Input placeholder='Порода' style={{width: "100%", textAlign: "start"}} onChange={e => handleChange("breed", e.target.value)} />
 				</div>
 				<div className={styles.choseBlock}>
 					<div className={styles.chooseText}>Дата рождения:</div>

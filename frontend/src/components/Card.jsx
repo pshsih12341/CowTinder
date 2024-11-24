@@ -5,15 +5,20 @@ import {toggleActive} from "../slices/pass"; // Импортируем дейс�
 import classNames from "classnames";
 import {formatDate} from "../helpers/date";
 
-const Card = ({id, sex, birth_date, id_individual, father_id, mother_id, createDate, active = false}) => {
+const Card = ({id, sex, birth_date, id_individual, father_id, mother_id, createDate, active = false, flag = false}) => {
 	const dispatch = useDispatch();
 
 	const handleClick = () => {
-		dispatch(toggleActive(id));
+		if (!flag) {
+			dispatch(toggleActive(id));
+		}
 	};
 
 	return (
 		<div className={classNames(styles.card, active && styles.active)} onClick={handleClick}>
+			{flag ?
+				<div className={classNames(styles.text, styles.center)}>Подбор от	: {formatDate(createDate)}</div>
+			:	null}
 			<div className={styles.div}>
 				<div className={styles.text}>Пол особи:</div>
 				<div className={styles.text}>{sex}</div>
@@ -34,7 +39,9 @@ const Card = ({id, sex, birth_date, id_individual, father_id, mother_id, createD
 				<div className={styles.text}>ID матери:</div>
 				<div className={styles.text}>{mother_id}</div>
 			</div>
-			<div className={classNames(styles.text, styles.center)}>Дата загрузки: {formatDate(createDate)}</div>
+			{!flag ?
+				<div className={classNames(styles.text, styles.center)}>Дата загрузки: {formatDate(createDate)}</div>
+			:	null}
 		</div>
 	);
 };

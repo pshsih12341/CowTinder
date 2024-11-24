@@ -2,12 +2,14 @@ import React, {useState} from "react";
 import styles from "./SearchPage.module.scss";
 import {useSelector, useDispatch} from "react-redux";
 import {Button, Select, Steps} from "antd";
-import {setField} from "../../slices/search"; // Импортируем setFile
 import CardsFolder from "../../components/CardsFolder";
-import {setSend} from "../../slices/pass";
+import {sendPassData, setSend, toggleActive} from "../../slices/pass";
+import {useNavigate} from "react-router-dom";
 
 const SearchPage = () => {
 	const activeElem = useSelector(state => state.pass?.activeElem);
+	const length = useSelector(s => s.pass?.history);
+	const navigate = useNavigate();
 	const dispatch = useDispatch();
 	const [type, setType] = useState("Чистопородное разведение");
 	const [direction, setDirection] = useState("Удойная особь");
@@ -23,6 +25,13 @@ const SearchPage = () => {
 			subTitle: "Выбрать тип и цель разведения",
 		},
 	];
+
+	const handleSumbit = () => {
+		dispatch(setSend({type, direction}));
+		dispatch(sendPassData());
+		dispatch(toggleActive(null));
+		navigate(`/history/${length.length + 1}`);
+	};
 	return (
 		<div className={styles.page}>
 			<div>
@@ -67,7 +76,7 @@ const SearchPage = () => {
 							]}
 						/>
 					</div>
-					<Button onClick={() => dispatch(setSend({type, direction}))} className={styles.brnas}>
+					<Button onClick={handleSumbit} className={styles.brnas}>
 						Подобрать кандидатов
 					</Button>
 				</>

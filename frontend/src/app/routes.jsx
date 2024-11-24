@@ -4,6 +4,7 @@ import Layout from "../pages/Layout/Layout";
 import HistoryPage from "../pages/HistoryPage/HistoryPage";
 import SearchPage from "../pages/SearchPage/SearchPage";
 import CreatePage from "../pages/CreatePage/CreatePage";
+import ResPage from "../pages/ResPage/ResPage";
 
 const router = createBrowserRouter([
 	{
@@ -29,6 +30,10 @@ const router = createBrowserRouter([
 			{
 				path: "home/createPass",
 				element: <CreatePage />,
+			},
+			{
+				path: "history/:id",
+				element: <ResPage />,
 			},
 			{
 				path: "*", // Обработка несуществующих маршрутов

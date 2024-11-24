@@ -9,6 +9,7 @@
 	line-height: 24px;
 	border-radius: 20px;
 	box-shadow: 0px 4px 8px 0px #00000040;
+	text-decoration: none;
 }
 .pass {
 	padding: 8px 16px;
@@ -34,4 +35,16 @@
 	display: flex;
 	width: 100%;
 	justify-content: space-between;
+	text-decoration: none;
+}
+.text {
+	text-decoration: none;
+	color: #000;
+	font-size: 16px;
+	font-style: normal;
+	font-weight: 400;
+	line-height: 24px; /* 150% */
+}
+.text:hover {
+	text-decoration: none;
 }
