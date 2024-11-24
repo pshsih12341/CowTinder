@@ -17,7 +17,6 @@ def calculate_offspring(cow: Cow, direction: Direction, type: TypeCross, db: Ses
     Вычисление совместимости по фенотипу и нахождение мутация по генотипу
     """
     result = calculate(cow.model_dump(), direction, type, db)
-    print(result)
     return [item for item in result]
 
 @router.post("/preprocess")
