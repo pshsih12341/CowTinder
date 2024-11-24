@@ -130,6 +130,9 @@ input {
 	background: #888; /* Цвет ползунка */
 	border-radius: 5px; /* Скругленные углы */
 }
+a {
+	text-decoration: none;
+}
 
 /* Стили фона скроллбара (track) */
 ::-webkit-scrollbar-track {
@@ -145,4 +148,3 @@ input {
 body::-webkit-scrollbar {
 	display: none;
 }
-	

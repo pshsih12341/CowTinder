@@ -1,26 +1,21 @@
 import React from "react";
 import {useDispatch, useSelector} from "react-redux";
-import {Button, Upload} from "antd";
-import {useNavigate} from "react-router-dom";
-import {addFile} from "../../slices/pass";
+import {Button} from "antd";
+import {Link, useNavigate} from "react-router-dom";
 import {setActive} from "../../slices/search";
-import {UploadOutlined} from "@ant-design/icons";
-import Card from "../../components/Card";
+import {PlusOutlined, UploadOutlined} from "@ant-design/icons";
 import styles from "./homePage.module.scss";
+import CardsFolder from "../../components/CardsFolder";
 
 const HomePage = () => {
-	const files = useSelector(state => state.pass);
+	const data = useSelector(state => state.pass?.data);
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 
-	const onUpload = file => {
-		if (file) {
-			dispatch(addFile(file)); // Добавляем файл в Redux
-		}
-	};
+	const activeel = useSelector(s => s.pass.activeElem);
 
 	const onClick = () => {
-		dispatch(setActive(files.activeElem));
+		dispatch(setActive(data.activeElem));
 		navigate("/search");
 	};
 
@@ -28,13 +23,16 @@ const HomePage = () => {
 		<div className={styles.page}>
 			<div className={styles.title}>База паспортов</div>
 			<div className={styles.block}>
-				Загрузить новый паспорт:
-				<Upload action={file => onUpload(file)} showUploadList={false}>
+				Загрузите или создайте новый паспорт:
+				<div className={styles.btns}>
 					<Button icon={<UploadOutlined />}>Загрузить</Button>
-				</Upload>
+					<Link to={"/home/createPass"}>
+						<Button icon={<PlusOutlined />}>Создать</Button>
+					</Link>
+				</div>
 			</div>
-			{files.data?.length && files.data.map(el => <Card file={el.file.name} date={el.date} key={el.id} id={el.id} active={files.activeElem?.id === el.id} />)}
-			{files.activeElem && (
+			<CardsFolder />
+			{activeel && (
 				<Button className={styles.btn} onClick={onClick}>
 					Подобрать партнера
 				</Button>

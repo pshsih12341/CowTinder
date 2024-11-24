@@ -1,13 +1,18 @@
 import React, {useState} from "react";
 import styles from "./SearchPage.module.scss";
 import {useSelector, useDispatch} from "react-redux";
-import {Button, Input, InputNumber, Select, Steps} from "antd";
-import {setField} from "../../slices/search"; // Импортируем setFile
-import classNames from "classnames";
+import {Button, Select, Steps} from "antd";
+import CardsFolder from "../../components/CardsFolder";
+import {sendPassData, setSend, toggleActive} from "../../slices/pass";
+import {useNavigate} from "react-router-dom";
 
 const SearchPage = () => {
-	const activeElem = useSelector(state => state.search?.activeElem);
+	const activeElem = useSelector(state => state.pass?.activeElem);
+	const length = useSelector(s => s.pass?.history);
+	const navigate = useNavigate();
 	const dispatch = useDispatch();
+	const [type, setType] = useState("Чистопородное разведение");
+	const [direction, setDirection] = useState("Удойная особь");
 
 	const [step, setStep] = useState(0);
 	const steps = [
@@ -19,17 +24,13 @@ const SearchPage = () => {
 			title: "Шаг 2",
 			subTitle: "Выбрать тип и цель разведения",
 		},
-		{
-			title: "Шаг 3",
-			subTitle: "Настроить параметры подбора",
-		},
 	];
 
-	const handleFileChange = e => {
-		const file = e.target.files[0];
-		if (file) {
-			dispatch(setField({field: "file", value: file})); // Диспатчим файл в стейт
-		}
+	const handleSumbit = () => {
+		dispatch(setSend({type, direction}));
+		dispatch(sendPassData());
+		dispatch(toggleActive(null));
+		navigate(`/history/${length.length + 1}`);
 	};
 	return (
 		<div className={styles.page}>
@@ -39,19 +40,8 @@ const SearchPage = () => {
 			</div>
 			{step === 0 && (
 				<>
-					<div className={styles.block}>
-						<div className={styles.text}>
-							<div>Загрузите электронный паспорт животного</div>
-							<div className={styles.subTitle}>(поддерживаемые форматы: xls, xlsx, tsv или vcf)</div>
-						</div>
-						<div className={styles.uploadWrapper}>
-							<input type='file' accept='.xls,.xlsx,.tsv,.vcf' onChange={handleFileChange} id='file-upload' className={styles.uploadInput} />
-							<label htmlFor='file-upload' className={styles.uploadLabel}>
-								{activeElem?.file?.name || "Выберите файл"}
-							</label>
-						</div>
-					</div>
-					<Button onClick={() => setStep(1)} className={styles.brnas} disabled={!activeElem?.file}>
+					<CardsFolder />
+					<Button onClick={() => setStep(1)} className={styles.centerBtn} disabled={!activeElem}>
 						Перейти к следующему шагу
 					</Button>
 				</>
@@ -62,10 +52,10 @@ const SearchPage = () => {
 						<div className={styles.subttitle}>Выберите тип и цель разведения</div>
 						<div className={styles.choose}>Тип разведения:</div>
 						<Select
-							defaultValue='Чистопородное разведение'
+							defaultValue={type}
 							style={{width: "100%", textAlign: "start"}}
 							className={styles.Select}
-							onChange={value => dispatch(setField({field: "type", value}))}
+							onChange={value => setType(value)}
 							options={[
 								{value: "Чистопородное разведение", label: "Чистопородное разведение"},
 								{value: "Инбридинг", label: "Инбридинг"},
@@ -75,10 +65,10 @@ const SearchPage = () => {
 						/>
 						<div className={styles.choose}>Цель разведения:</div>
 						<Select
-							defaultValue='Удойная особь'
+							defaultValue={direction}
 							style={{width: "100%", textAlign: "start"}}
 							className={styles.Select}
-							onChange={value => dispatch(setField({field: "goal", value}))}
+							onChange={value => setDirection(value)}
 							options={[
 								{value: "Удойная особь", label: "Удойная особь"},
 								{value: "Мясная особь", label: "Мясная особь"},
@@ -86,66 +76,9 @@ const SearchPage = () => {
 							]}
 						/>
 					</div>
-					<Button onClick={() => setStep(2)} className={styles.brnas} disabled={!activeElem?.file}>
-						Перейти к следующему шагу
+					<Button onClick={handleSumbit} className={styles.brnas}>
+						Подобрать кандидатов
 					</Button>
-				</>
-			)}
-			{step === 2 && (
-				<>
-					<div className={classNames(styles.block, styles.chooseBlock)}>
-						<div className={styles.textBlock}>
-							<div className={styles.subttitle}>Выберите параметры для подбора</div>
-							<div className={styles.description}>Можно оставить пустыми для подбора лучших кандидатов или выбрать опеределенные параметры</div>
-						</div>
-						<div className={styles.selectBlock}>
-							<div className={styles.choose}>Введите значение минимального удоя в день (литры)</div>
-							<Input placeholder='Значения удоя' onChange={e => dispatch(setField({field: "milk", value: e.target.value}))} />
-						</div>
-						<div className={styles.selectBlock}>
-							<div className={styles.choose}>Введите минимальное и максимальное значения коэффициента инбридинга (0,00 - 1,00)</div>
-							<div className={styles.inputs}>
-								<InputNumber placeholder='Кооэфициент' style={{width: "100%"}} onChange={value => dispatch(setField({field: "minInb", value}))} min={0} max={1} precision={2} />
-								<InputNumber placeholder='Кооэфициент' style={{width: "100%"}} onChange={value => dispatch(setField({field: "maxInb", value}))} min={0} max={1} precision={2} />
-							</div>
-						</div>
-						<div className={styles.selectBlock}>
-							<div className={styles.choose}>Введите минимальное и максимальное значения упитанности (1-5)</div>
-							<div className={styles.inputs}>
-								<InputNumber placeholder='Упитанность' style={{width: "100%"}} onChange={value => dispatch(setField({field: "minPlot", value}))} min={1} max={5} />
-								<InputNumber placeholder='Упитанность' style={{width: "100%"}} onChange={value => dispatch(setField({field: "maxPlot", value}))} min={1} max={5} />
-							</div>
-						</div>
-						<div className={styles.selectBlock}>
-							<div className={styles.choose}>Введите минимальное и максимальное значения баллов здоровья (1-10)</div>
-							<div className={styles.inputs}>
-								<InputNumber placeholder='Здоровье' style={{width: "100%"}} onChange={value => dispatch(setField({field: "minHealth", value}))} min={1} max={10} />
-								<InputNumber placeholder='Здоровье' style={{width: "100%"}} onChange={value => dispatch(setField({field: "maxHealth", value}))} min={1} max={10} />
-							</div>
-						</div>
-						<div className={styles.selectBlock}>
-							<div className={styles.choose}>Введите минимальное и максимальное значения баллов здоровья (1-10)</div>
-							<div className={styles.inputs}>
-								<InputNumber placeholder='Здоровье' style={{width: "100%"}} onChange={value => dispatch(setField({field: "minHealth", value}))} min={1} max={10} />
-								<InputNumber placeholder='Здоровье' style={{width: "100%"}} onChange={value => dispatch(setField({field: "maxHealth", value}))} min={1} max={10} />
-							</div>
-						</div>
-						<div className={styles.selectBlock}>
-							<div className={styles.choose}>Введите минимальное и максимальное значения процента фертильности (1-100)</div>
-							<div className={styles.inputs}>
-								<InputNumber placeholder='Здоровье' style={{width: "100%"}} onChange={value => dispatch(setField({field: "minHealth", value}))} min={1} max={100} />
-								<InputNumber placeholder='Здоровье' style={{width: "100%"}} onChange={value => dispatch(setField({field: "maxHealth", value}))} min={1} max={100} />
-							</div>
-						</div>
-						<div className={styles.selectBlock}>
-							<div className={styles.choose}>Введите минимальное и максимальное значения генетической ценности (1-100)</div>
-							<div className={styles.inputs}>
-								<InputNumber placeholder='Здоровье' style={{width: "100%"}} onChange={value => dispatch(setField({field: "minHealth", value}))} min={1} max={100} />
-								<InputNumber placeholder='Здоровье' style={{width: "100%"}} onChange={value => dispatch(setField({field: "maxHealth", value}))} min={1} max={100} />
-							</div>
-						</div>
-					</div>
-					<Button>Подобрать кандидатов</Button>
 				</>
 			)}
 		</div>

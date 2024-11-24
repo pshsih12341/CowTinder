@@ -1,5 +1,5 @@
 .page {
-	padding: 25px 22.5px 100px;
+	padding: 25px 22.5px 125px;
 	display: flex;
 	flex-direction: column;
 	gap: 25px;
@@ -14,10 +14,14 @@
 	color: white;
 	position: fixed;
 	z-index: 10;
-	bottom: 80px;
+	bottom: 85px;
 	left: 50%; /* Центрирование по горизонтали */
 	transform: translateX(-50%);
 	border-radius: 8px;
+}
+.btns {
+	display: flex;
+	gap: 10px;
 }
 .block {
 	display: flex;
