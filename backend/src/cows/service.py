@@ -74,8 +74,8 @@ def apply_effects_to_cow(base_cow, partner_cow, effects):
     return updated_values
 
 def calculate(cow: Cow, direction: Direction, type: TypeCross) -> pd.DataFrame:
-    phenotype_path = '../../data/Датасет на хакатон.xlsx'
-    genotype_path = '../../data/Генетические мутации хакатон.xlsx'
+    phenotype_path = './data/Датасет на хакатон.xlsx'
+    genotype_path = './data/Генетические мутации хакатон.xlsx'
 
     if not os.path.exists(phenotype_path) and not os.path.exists(genotype_path): 
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Файлы данных не найдены!')
