@@ -1,50 +1,59 @@
 import pandas as pd
+from datetime import datetime
+
+# Чтение данных из файла
+def read_data(file_path: str) -> pd.DataFrame:
+    try:
+        data = pd.read_excel(file_path, engine='openpyxl')
+        if 'birth_date' in data.columns:
+            data['birth_date'] = pd.to_datetime(data['birth_date'], errors='coerce')
+            today = datetime.today()
+            data['age'] = data['birth_date'].apply(
+                lambda x: (today - x).days // 365 if pd.notnull(x) else None
+            )
+        return data
+    except Exception as e:
+        print(f"Ошибка при чтении файла: {e}")
+        return pd.DataFrame()
 
 #* ФУНКЦИИ ДЛЯ ГЕНОТИПА
+def get_mutations(genotype_data, cow_id):
+    return genotype_data[genotype_data['id_individual'] == cow_id].to_dict(orient='records') 
 
-# Проверка на мутацию
-def check_mutation(genotype: str, ref: str, alt: str) -> float:   
-    if genotype == f"{alt}/{alt}":
-        return 1
-    elif genotype == f"{ref}/{ref}":
-        return 0
-    elif genotype == f"{ref}/{alt}" or genotype == f"{alt}/{ref}":
-        return 0.5
-    else:
-        return -1
+# Функция для расчета вклада каждой мутации
+def calculate_phenotypic_effect(genotype, beta):
+    alleles = genotype.split('/')
+    if len(alleles) == 2 and alleles[0] == alleles[1]:  # Гомозиготный генотип
+        return 2 * beta
+    else:  # Гетерозиготный генотип или некорректный формат
+        return beta
+    
+# Переименование колонок
+def rename_columns_genotype(data: pd.DataFrame) -> pd.DataFrame:
+    column_mapping = {
+        'mutation_id': 'mutation_id',
+        'chrom': 'chrom',	
+        'pos': 'pos',	
+        'ref': 'ref',	
+        'alt': 'alt',	
+        'Признак': 'trait',	
+        'beta': 'beta',	
+        'Генотип коровы': 'genotype_cow',
+        'ID_особи': 'id_individual'
+    }
 
-# Определение типа мутации
-def determine_mutation_type(genotype: str) -> str:
-    if pd.isna(genotype):
-        return None
-    ref, alt = genotype.split('/')
-    if ref == alt:
-        return 'Гомозигота'
-    else:
-        return 'Гетерозигота'
+    # Корректно выбираем существующие колонки для переименования
+    columns_to_rename = {key: value for key, value in column_mapping.items() if key in data.columns}
 
-# Закон менделя вероятность
-def mendelian_probability(dad: str, mom: str) -> dict:
-    if dad == 'Гомозигота' and mom == 'Гомозигота':
-        return {'Гомозигота': 1.0, 'Гетерозигота': 0.0}
-    elif dad == 'Гетерозигота' and mom == 'Гетерозигота':
-        return {'Гомозигота': 0.25, 'Гетерозигота': 0.5, 'Гомозигота (рецессивная)': 0.25}
-    elif (dad == 'Гомозигота' and mom == 'Гетерозигота') or (dad == 'Гетерозигота' and mom == 'Гомозигота'):
-        return {'Гомозигота': 0.5, 'Гетерозигота': 0.5}
-    else:
-        return {'Гомозигота': 0.0, 'Гетерозигота': 0.0, 'Гомозигота (рецессивная)': 1.0}
+    # Переименовываем только подходящие колонки
+    data.rename(columns=columns_to_rename, inplace=True)
 
-# Подсчет финального значения признака, после мутации
-def calculate_final_trait(row: pd.Series) -> float:
-    base_value = row[row['Признак']]
-    return base_value + row['beta'] * row['is_mutation']
-
-
+    return data
 
 #* ФУНКЦИИ ДЛЯ ФЕНОТИПА
 
 # Переименование колонок
-def rename_columns(data: pd.DataFrame) -> pd.DataFrame:
+def rename_columns_phenotype(data: pd.DataFrame) -> pd.DataFrame:
     column_mapping = {
         'ID_особи': 'id_individual',
         'Пол': 'sex',
