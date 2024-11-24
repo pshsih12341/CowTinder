@@ -1,5 +1,6 @@
 import pandas as pd
 from datetime import datetime
+from .models import Genotype
 
 # Чтение данных из файла
 def read_data(file_path: str) -> pd.DataFrame:
@@ -18,7 +19,16 @@ def read_data(file_path: str) -> pd.DataFrame:
 
 #* ФУНКЦИИ ДЛЯ ГЕНОТИПА
 def get_mutations(genotype_data, cow_id):
-    return genotype_data[genotype_data['id_individual'] == cow_id].to_dict(orient='records') 
+    mutations = []
+    for genotype in genotype_data:
+        if genotype.id_individual == cow_id:
+            mutations.append({
+                'trait': genotype.trait,
+                'beta': genotype.beta,
+                'alt': genotype.alt,
+                'ref': genotype.ref
+            })
+    return mutations
 
 # Функция для расчета вклада каждой мутации
 def calculate_phenotypic_effect(genotype, beta):
@@ -100,16 +110,15 @@ def evaluate_cow(cow, common_weights, direction_weights, direction):
     penalty += calculate_penalty(cow['genetic_value'], (80, 100), common_weights['genetic_value'])
 
     
-    if direction.value in direction_weights: 
-        dir_weights = direction_weights[direction.value] 
+    if isinstance(direction, str) and direction in direction_weights:
+        dir_weights = direction_weights[direction] 
         penalty += calculate_penalty(cow['milk_yield_day'], 30, dir_weights['milk_yield_day']) # Укажите свои оптимальные значения 
         penalty += calculate_penalty(cow['weight_gain_day'], 0.7, dir_weights['weight_gain_day']) 
-    else:
-        print('Не зашел')
+
     return penalty
 
 # Подсчет совместимости
 def calculate_compatibility(cow, my_cow, cow_penalty, my_cow_penalty):
-    if cow['sex'] == my_cow['sex']:
+    if cow.sex == my_cow.sex:
         return 0
     return 100 - (abs(cow_penalty - my_cow_penalty) / max(cow_penalty, my_cow_penalty)) * 100
