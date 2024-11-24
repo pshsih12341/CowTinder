@@ -30,7 +30,7 @@ const ResPage = () => {
 			:	<>
 					<Card id={item?.person?.id} sex={item?.person?.sex} birth_date={item?.person?.birth_date} id_individual={item?.person?.id_individual} father_id={item?.person?.father_id} mother_id={item?.person?.mother_id} createDate={item?.loadDate} flag />
 					<MutationGraph data={item.data} type={type} />
-					<Radio.Group block options={options} defaultValue={type} optionType='button' buttonStyle='solid' onChange={e => setType(e.target.value)} className={styles.radio}/>
+					<Radio.Group block options={options} defaultValue={type} optionType='button' buttonStyle='solid' onChange={e => setType(e.target.value)} className={styles.radio} />
 					{item?.data.map((el, index) => (
 						<Candidate number={index + 1} key={el.id_individual} id_individual={el.id_individual} sex={el.sex} birth_date={el.birth_date} compatibility={el.compatibility} id={id} />
 					))}
