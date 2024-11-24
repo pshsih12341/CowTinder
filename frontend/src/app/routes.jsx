@@ -5,6 +5,7 @@ import HistoryPage from "../pages/HistoryPage/HistoryPage";
 import SearchPage from "../pages/SearchPage/SearchPage";
 import CreatePage from "../pages/CreatePage/CreatePage";
 import ResPage from "../pages/ResPage/ResPage";
+import CandidatePage from "../pages/CandidatePage/CandidatePage";
 
 const router = createBrowserRouter([
 	{
@@ -34,6 +35,10 @@ const router = createBrowserRouter([
 			{
 				path: "history/:id",
 				element: <ResPage />,
+			},
+			{
+				path: "history/:id/:personId",
+				element: <CandidatePage />,
 			},
 			{
 				path: "*", // Обработка несуществующих маршрутов

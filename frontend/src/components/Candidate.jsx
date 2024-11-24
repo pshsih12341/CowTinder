@@ -6,7 +6,7 @@ import {formatDate} from "../helpers/date";
 
 const Candidate = ({number, id_individual, sex, birth_date, compatibility, id}) => {
 	return (
-		<Link to={`/history/${id}/${number}`}>
+		<Link to={`/history/${id}/${id_individual}`}>
 			<div className={styles.card}>
 				<div className={classNames(styles.text, styles.center)}>Кандидат №{number}</div>
 				<div className={styles.div}>

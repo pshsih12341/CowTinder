@@ -1,6 +1,6 @@
 import React from "react";
 import styles from "./card.module.scss";
-import {useDispatch, useSelector} from "react-redux";
+import {useDispatch} from "react-redux";
 import {toggleActive} from "../slices/pass"; // Импортируем действие
 import classNames from "classnames";
 import {formatDate} from "../helpers/date";
@@ -17,7 +17,7 @@ const Card = ({id, sex, birth_date, id_individual, father_id, mother_id, createD
 	return (
 		<div className={classNames(styles.card, active && styles.active)} onClick={handleClick}>
 			{flag ?
-				<div className={classNames(styles.text, styles.center)}>Подбор от	: {formatDate(createDate)}</div>
+				<div className={classNames(styles.text, styles.center)}>Подбор от : {formatDate(createDate)}</div>
 			:	null}
 			<div className={styles.div}>
 				<div className={styles.text}>Пол особи:</div>
