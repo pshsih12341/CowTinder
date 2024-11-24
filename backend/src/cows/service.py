@@ -1,9 +1,29 @@
 import pandas as pd
 from fastapi import HTTPException, status
-from .utils import rename_columns_phenotype, rename_columns_genotype, evaluate_cow, calculate_compatibility, get_mutations, calculate_phenotypic_effect, read_data
+from sqlalchemy.orm import Session
+from database import get_session
+from .utils import evaluate_cow, calculate_compatibility, get_mutations, calculate_phenotypic_effect
 from .config import common_weights, direction_weights
 from .schemas import Cow, TypeCross, Direction
-import os
+from .models import Phenotype, Genotype, PhenotypeWithPenalties
+
+def get_penalty_for_cow(db: Session, cow_id: int, direction: str) -> float:
+    penalty_column = None
+    if direction == 'milk':
+        penalty_column = 'penalty_milk'
+    elif direction == 'meat':
+        penalty_column = 'penalty_meat'
+    elif direction == 'combined':
+        penalty_column = 'penalty_combined'
+
+    if penalty_column is None:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Invalid direction value!')
+
+    penalty = db.query(PhenotypeWithPenalties).filter(PhenotypeWithPenalties.id_individual == cow_id).first() 
+    if penalty: 
+        return getattr(penalty, penalty_column) 
+    else: 
+        return None
 
 # Подсчет вероятности проявления мутации для каждого признака    
 def calculate_mutation_probabilities(individual, partner, genotype_data):
@@ -73,50 +93,29 @@ def apply_effects_to_cow(base_cow, partner_cow, effects):
         } 
     return updated_values
 
-def calculate(cow: Cow, direction: Direction, type: TypeCross) -> pd.DataFrame:
-    phenotype_path = './data/Датасет на хакатон.xlsx'
-    genotype_path = './data/Генетические мутации хакатон.xlsx'
+def calculate(cow_data: dict, direction: Direction, type: TypeCross, db: Session) -> pd.DataFrame:  
+    cow = Cow(**cow_data)
+    phenotype_data = db.query(Phenotype).filter(Phenotype.id_individual != cow.id_individual, Phenotype.sex != cow.sex).all()
+    genotype_data = db.query(Genotype).all()
 
-    if not os.path.exists(phenotype_path) and not os.path.exists(genotype_path): 
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Файлы данных не найдены!')
-    
-    phenotype_data = read_data(phenotype_path)
-    phenotype_data.fillna(0, inplace=True)
-    phenotype_data = rename_columns_phenotype(phenotype_data)
-
-    genotype_data = read_data(genotype_path)
-    genotype_data = rename_columns_genotype(genotype_data)
-    phenotype_data['mutations'] = phenotype_data['id_individual'].apply(lambda x: get_mutations(genotype_data, x))
-
-    cow['mutations'] = get_mutations(genotype_data, cow['id_individual'])
-
+    # for phenotype in phenotype_data: phenotype.mutations = get_mutations(genotype_data, phenotype.id_individual) 
+    # cow.mutations = get_mutations(genotype_data, cow.id_individual) 
     updated_cows = []
 
     if type.value == 'purebred':
-        phenotype_data = phenotype_data[(phenotype_data['id_individual'] != cow['id_individual']) &
-                                    (phenotype_data['sex'] != cow['sex'])]
-        
-        phenotype_data['penalty'] = phenotype_data.apply(
-            lambda row: evaluate_cow(row, common_weights, direction_weights, direction),
-            axis = 1
-        )
+        phenotype_data = [p for p in phenotype_data if p.breed == cow.breed]
 
-        cow_penalty = evaluate_cow(pd.Series(cow), common_weights, direction_weights, direction)
+        for partner_cow in phenotype_data:
+            partner_penalty = get_penalty_for_cow(db, partner_cow.id_individual, direction.value)
+            cow_penalty = get_penalty_for_cow(db, cow.id_individual, direction.value)
 
-        phenotype_data['compatibility'] = phenotype_data.apply( 
-            lambda row: calculate_compatibility(row, pd.Series(cow), row['penalty'], cow_penalty), 
-            axis = 1
-        )
+            if not cow_penalty:
+                cow_penalty = evaluate_cow(cow, common_weights, direction_weights, direction.value)
 
-        # Отфильтровали и отсортировали лучших коров по совместимости по фенотипу
-        filtered_data = phenotype_data[(phenotype_data['breed'] == cow['breed'])]
-        sorted_data = filtered_data.sort_values(by='compatibility', ascending=False)
+            compatibility = calculate_compatibility(partner_cow, cow, partner_penalty, cow_penalty)
 
-        # Нахождение вероятности появления признака мутации и насколько измениться признак 
-        for _, partner_cow in sorted_data[:10].iterrows():
-            if partner_cow['id_individual'] != cow['id_individual'] and partner_cow['sex'] != cow['sex']:
-                effects = calculate_mutation_probabilities(cow, partner_cow, genotype_data)
-                updated_values = apply_effects_to_cow(cow, partner_cow, effects)
-                updated_cows.append({**partner_cow.to_dict(), 'mutations_child': updated_values})
+            # effects = calculate_mutation_probabilities(cow, partner_cow, genotype_data)
+            # updated_values = apply_effects_to_cow(cow, partner_cow, effects) 
+            updated_cows.append({**partner_cow.__dict__, 'compatibility': compatibility})
 
-    return pd.DataFrame(updated_cows)
+    return sorted(updated_cows, key=lambda x: x['compatibility'], reverse=True)[:10]
